@@ -1,38 +1,42 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Login.module.css";
-import { FaUser, FaLock, FaEnvelope} from "react-icons/fa";
-import { doSignInWithEmailAndPassword, doCreateUserWithEmailAndPassword } from "../../firebase/auth";
+import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
+import {
+  doSignInWithEmailAndPassword,
+  doCreateUserWithEmailAndPassword,
+} from "../../firebase/auth";
 import { toast, ToastContainer } from "react-toastify";
 import { auth, db } from "../../firebase/firebase";
 import { setDoc, doc } from "firebase/firestore";
 
-
 const LoginPage = () => {
-
   // Firebase Setup
 
   //login
-  const [lemail, setLEmail] = useState('');
-  const [lpassword, setLPassword] = useState('');
+  const [lemail, setLEmail] = useState("");
+  const [lpassword, setLPassword] = useState("");
 
   //register
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fname, setFname] = useState('');
-  const [lname, setLname] = useState('');
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fname, setFname] = useState("");
+  const [lname, setLname] = useState("");
 
   //register
-  const handleRegister = async(e)=>{
+  const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await doCreateUserWithEmailAndPassword(email,password);
+      await doCreateUserWithEmailAndPassword(email, password);
       const user = auth.currentUser;
-      if (user){
+      if (user) {
         await setDoc(doc(db, "Users", user.uid), {
           email: user.email,
           firstname: fname,
           lastname: lname,
+          EquipmentAvailability: {
+            Sensors: false,
+            VRHeadset: false,
+          },
         });
       }
       toast.success("User Registered Successfully!!", {
@@ -40,123 +44,168 @@ const LoginPage = () => {
       });
     } catch (error) {
       toast.error(error.message, {
-        position: "top-center"
+        position: "top-center",
       });
     }
-  }
-
+  };
 
   //login
-  const handleLogin = async(e)=>{
+  const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await doSignInWithEmailAndPassword(lemail,lpassword);
+      await doSignInWithEmailAndPassword(lemail, lpassword);
       toast.success("Logged In Successfully!!", {
         position: "top-center",
       });
-      window.location.href="/MainDashboard";
+      window.location.href = "/MainDashboard";
     } catch (error) {
       toast.error(error.message, {
-        position: "top-center"
+        position: "top-center",
       });
     }
-  }
+  };
   // Firebase Setup
 
   //annimation
 
-  const [action, setAction] = useState('');
+  const [action, setAction] = useState("");
 
   const registerLink = () => {
-    setAction('active');
+    setAction("active");
   };
 
   const loginLink = () => {
-    setAction('');
+    setAction("");
   };
-
 
   //background color
   useEffect(() => {
-    document.body.className = 'bodyLogin'; // Change body class to match ComponentA style
+    document.body.className = "bodyLogin"; // Change body class to match ComponentA style
 
     return () => {
-      document.body.className = ''; // Reset body class when leaving the component
+      document.body.className = ""; // Reset body class when leaving the component
     };
   }, []);
 
   return (
-    <div className={`${styles.wrapper} ${action ? styles.wrapperActive : ''}`}>
-      
-
+    <div className={`${styles.wrapper} ${action ? styles.wrapperActive : ""}`}>
       {/* Login */}
-        <div className={`${styles['form-box']} ${styles.login}`}>
-          <form onSubmit={handleLogin}>
-            <h1>Sign In</h1>
-            <div className={styles['input-box']}>
-              <input type="email" placeholder='Email' value={lemail} onChange={(e) => setLEmail(e.target.value)} required />
-              <FaEnvelope className={styles.icon}/>
-            </div>
-            <div className={styles['input-box']}>
-              <input type="password" placeholder='Password' value={lpassword} onChange={(e) => setLPassword(e.target.value)} required />
-              <FaLock className={styles.icon}/>
-            </div>
+      <div className={`${styles["form-box"]} ${styles.login}`}>
+        <form onSubmit={handleLogin}>
+          <h1>Sign In</h1>
+          <div className={styles["input-box"]}>
+            <input
+              type="email"
+              placeholder="Email"
+              value={lemail}
+              onChange={(e) => setLEmail(e.target.value)}
+              required
+            />
+            <FaEnvelope className={styles.icon} />
+          </div>
+          <div className={styles["input-box"]}>
+            <input
+              type="password"
+              placeholder="Password"
+              value={lpassword}
+              onChange={(e) => setLPassword(e.target.value)}
+              required
+            />
+            <FaLock className={styles.icon} />
+          </div>
 
-            <div className={styles['remember-forgot']}>
-               <div></div>
-              <a href="#">Forgot password</a>
-            </div>
+          <div className={styles["remember-forgot"]}>
+            <div></div>
+            <a href="#">Forgot password</a>
+          </div>
 
-            <button type="submit">Login</button>
+          <button type="submit">Login</button>
 
-            <div className={styles['register-link']}>
-              <p>Don't have an account? <a href="#" onClick={registerLink}>Register</a></p>
-            </div>
-          </form>
-        </div>
+          <div className={styles["register-link"]}>
+            <p>
+              Don't have an account?{" "}
+              <a
+                href="#"
+                onClick={registerLink}>
+                Register
+              </a>
+            </p>
+          </div>
+        </form>
+      </div>
 
+      {/* Register */}
+      <div className={`${styles["form-box"]} ${styles.register}`}>
+        <form onSubmit={handleRegister}>
+          <h1>Register</h1>
+          <div className={styles["input-box"]}>
+            <input
+              type="text"
+              placeholder="First name"
+              value={fname}
+              onChange={(e) => setFname(e.target.value)}
+              required
+            />
+            <FaUser className={styles.icon} />
+          </div>
 
+          <div className={styles["input-box"]}>
+            <input
+              type="text"
+              placeholder="Last name"
+              value={lname}
+              onChange={(e) => setLname(e.target.value)}
+              required
+            />
+            <FaUser className={styles.icon} />
+          </div>
 
-        {/* Register */}
-        <div className={`${styles['form-box']} ${styles.register}`}>
-          <form onSubmit={handleRegister}>
-            <h1>Register</h1>
-            <div className={styles['input-box']}>
-              <input type="text" placeholder='First name' value={fname} onChange={(e) => setFname(e.target.value)} required />
-              <FaUser className={styles.icon}/>
-            </div>
+          <div className={styles["input-box"]}>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <FaEnvelope className={styles.icon} />
+          </div>
+          <div className={styles["input-box"]}>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <FaLock className={styles.icon} />
+          </div>
 
-            <div className={styles['input-box']}>
-              <input type="text" placeholder='Last name' value={lname} onChange={(e) => setLname(e.target.value)} required />
-              <FaUser className={styles.icon}/>
-            </div>
+          <div className={styles["remember-forgot"]}>
+            <label>
+              <input
+                type="checkbox"
+                required
+              />{" "}
+              I agree to the termes & conditions
+            </label>
+          </div>
 
-            <div className={styles['input-box']}>
-              <input type="email" placeholder='Email' value={email} onChange={(e) => setEmail(e.target.value)} required />
-              <FaEnvelope className={styles.icon}/>
+          <button type="submit">Register</button>
 
-            </div>
-            <div className={styles['input-box']}>
-              <input type="password" placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)} required />
-              <FaLock className={styles.icon}/>
-            </div>
-
-            <div className={styles['remember-forgot']}>
-              <label>
-                <input type="checkbox" required/> I agree to the termes & conditions
-              </label>
-            </div>
-
-            <button type="submit">Register</button>
-
-            <div className={styles['register-link']}>
-              <p>Already have an account? <a href="#" onClick={loginLink}>Login</a></p>
-            </div>
-          </form>
-        </div>
-        
+          <div className={styles["register-link"]}>
+            <p>
+              Already have an account?{" "}
+              <a
+                href="#"
+                onClick={loginLink}>
+                Login
+              </a>
+            </p>
+          </div>
+        </form>
+      </div>
     </div>
-    
   );
 };
 

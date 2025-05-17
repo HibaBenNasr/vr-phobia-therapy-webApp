@@ -6,7 +6,8 @@ import { doc, getDocs, collection } from "firebase/firestore";
 import Model from "react-modal";
 import RegisterNewPatient from "./RegisterPatient/RegisterNewPatient";
 
-const Patients = ({ theme }) => {
+const Patients = () => {
+  //Fetch pateints data
   const [patientsList, setPatientsList] = useState([]);
 
   const fetchPatientsData = async () => {
@@ -32,10 +33,7 @@ const Patients = ({ theme }) => {
     fetchPatientsData();
   }, []);
 
-  // const ExpandedComponent = ({ patientsList }) => (
-  //   <pre>{JSON.stringify(patientsList, null, 2)}</pre>
-  // );
-
+  // Table Columns
   const columns = [
     {
       name: "Last Name",
@@ -93,6 +91,7 @@ const Patients = ({ theme }) => {
     },
   ];
 
+  // Table Style
   const customStyles = {
     headRow: {
       style: {
@@ -118,6 +117,7 @@ const Patients = ({ theme }) => {
     },
   };
 
+  //Search
   const [search, setSearch] = useState("");
 
   const filteredData = patientsList.filter(
@@ -126,6 +126,7 @@ const Patients = ({ theme }) => {
       item.fname.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Model visible & style
   const [ModelVisible, setModelVisible] = useState(false);
 
   const customStylesModel = {
@@ -148,6 +149,7 @@ const Patients = ({ theme }) => {
     },
   };
 
+  //On Row Click
   const handleRowClick = () => (row) => {
     console.log(row);
     window.location.href = `/PatientDashboard?userId=${row.id}`;
