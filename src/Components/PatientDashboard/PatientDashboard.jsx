@@ -1,5 +1,5 @@
 import PatientHeader from "./PatientHeader";
-import MainPatientLayout from "./Layout/MainPatientLayout";
+import MainPatientLayout from "./MainPatientLayout/MainPatientLayout";
 import PatientSidebar, { PatientSidebarItem } from "./PatientSidebar";
 import React, { useEffect, useState } from "react";
 import {

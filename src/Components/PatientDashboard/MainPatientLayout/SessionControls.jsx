@@ -1,0 +1,83 @@
+import React from "react";
+import { ImArrowDown, ImArrowUp } from "react-icons/im";
+import ToggleSwitch from "./ToggleSwitch";
+
+const SessionControls = ({
+  sessionStat,
+  onStartClick,
+  onEndClick,
+  onLevelUp,
+  onLevelDown,
+  currentLevel,
+  onToggleMode,
+  sensorsOn,
+  mode,
+}) => {
+  return (
+    <div className="flex flex-row mb-3 h-full">
+      <div className="w-full bg-white mr-2 flex items-center justify-around dark:bg-gray-800 shadow-xs rounded-xl">
+        {/* Start Button */}
+        <button
+          className={`m-2 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-2/5 sm:w-auto px-2 py-2.5 text-center dark:bg-green-600 dark:hover:bg-blue-700 dark:focus:ring-green-800 ${
+            sessionStat.start_session ? "disabled" : ""
+          }`}
+          onClick={onStartClick}
+          disabled={sessionStat.start_session}>
+          Start Session
+        </button>
+
+        {/* End Button */}
+        <button
+          className={`m-2 text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-2/5 sm:w-auto px-2 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 ${
+            !sessionStat.start_session ? "disabled" : ""
+          }`}
+          onClick={onEndClick}
+          disabled={!sessionStat.start_session}>
+          End Session
+        </button>
+
+        {/* Level Controls */}
+        <div className="flex items-center">
+          <button
+            className={`my-3 mx-1 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-2/5 sm:w-auto px-2 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ${
+              mode !== "manual" ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={() => {
+              if (mode === "manual" && currentLevel < 5) onLevelUp();
+            }}
+            disabled={mode !== "manual"}
+            aria-label="Level Up">
+            <ImArrowUp className="text-l mx-auto" />
+          </button>
+          <p className="m-2 p-2.5">
+            Level {currentLevel != -2 ? ": " + currentLevel : ""}
+          </p>
+          <button
+            className={`my-3 mx-1 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-2/5 sm:w-auto px-2 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ${
+              mode !== "manual" ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={() => {
+              if (mode === "manual" && currentLevel > 0) onLevelDown();
+            }}
+            disabled={mode !== "manual"}
+            aria-label="Level Down">
+            <ImArrowDown className="text-l mx-auto" />
+          </button>
+        </div>
+
+        {/* Toggle */}
+        <div className="w-1/5">
+          <ToggleSwitch
+            labelOn="auto"
+            labelOff="manual"
+            onToggle={onToggleMode}
+            sensorsOn={sensorsOn}
+            currentMode={mode}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SessionControls;
