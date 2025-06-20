@@ -49,6 +49,7 @@ const CalendarLayout = () => {
           return {
             title: data.PatientName,
             start: data.AppointmentTime.toDate(), // Timestamp → JS Date
+            className: ["bg-blue-500 text-white "],
           };
         });
         console.log(Appointments);
@@ -101,7 +102,7 @@ const CalendarLayout = () => {
       <button
         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         onClick={() => setModelVisible(true)}>
-        Add New Event
+        Add New Appointment
       </button>
 
       <Model
@@ -122,10 +123,7 @@ const CalendarLayout = () => {
               Patient Name
             </label>
             <div className="flex justify-between items-center">
-              <FaAddressCard
-                className="mr-2"
-                size={30}
-              />
+              <FaAddressCard className="mr-2" size={30} />
               <input
                 type="text"
                 placeholder="Add Patient Name"
@@ -151,10 +149,7 @@ const CalendarLayout = () => {
           </div>
           <div className=" w-2/3 mb-5 ">
             <div className="flex justify-between items-center ">
-              <BiCalendar
-                size={30}
-                className="mr-2"
-              />
+              <BiCalendar size={30} className="mr-2" />
               <DatePicker
                 placeholderText="Start date"
                 selected={newEvent.start}

@@ -9,7 +9,8 @@ const StartSessionModal = ({
   onConfirm,
   newSession,
   setNewSession,
-  equipStat,
+  headStat,
+  sensorStat,
   phobias = [],
   levels = [],
   onModeToggle,
@@ -71,8 +72,10 @@ const StartSessionModal = ({
               <ToggleSwitch
                 labelOn="auto"
                 labelOff="manual"
-                onToggle={onModeToggle}
-                sensorsOn={equipStat?.sensors_ready}
+                onToggle={(mode) =>
+                  setNewSession({ ...newSession, Mode: mode })
+                }
+                sensorsOn={sensorStat}
                 currentMode=""
               />
             </div>
@@ -87,7 +90,7 @@ const StartSessionModal = ({
               <p className="text-center flex items-center justify-between">
                 Headset:{" "}
                 <span>
-                  {equipStat?.headset_ready ? (
+                  {headStat ? (
                     <FaCheckCircle size={20} color="green" />
                   ) : (
                     <CgUnavailable size={20} color="red" />
@@ -100,7 +103,7 @@ const StartSessionModal = ({
               <p className="text-center flex items-center justify-between">
                 Sensors:{" "}
                 <span>
-                  {equipStat?.sensors_ready ? (
+                  {sensorStat ? (
                     <FaCheckCircle size={20} color="green" />
                   ) : (
                     <CgUnavailable size={20} color="red" />
@@ -111,11 +114,11 @@ const StartSessionModal = ({
             <hr />
             <div className="p-1">
               <p className="text-center">
-                {equipStat?.headset_ready && equipStat?.sensors_ready
+                {headStat && sensorStat
                   ? "All Fine"
-                  : equipStat?.headset_ready && !equipStat?.sensors_ready
+                  : headStat && !sensorStat
                   ? "Can only use manual mode"
-                  : !equipStat?.headset_ready && equipStat?.sensors_ready
+                  : !headStat && sensorStat
                   ? "Headset Disconnected"
                   : "Impossible to start new session"}
               </p>
@@ -133,9 +136,19 @@ const StartSessionModal = ({
 
           <button
             onClick={onConfirm}
-            disabled={!equipStat?.headset_ready}
+            disabled={
+              !headStat ||
+              !newSession.Scene ||
+              newSession.InitialLevel < 0 ||
+              !newSession.Mode
+            }
             className={`focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ${
-              !equipStat?.headset_ready ? "cursor-not-allowed opacity-50" : ""
+              !headStat ||
+              !newSession.Scene ||
+              newSession.InitialLevel < 0 ||
+              !newSession.Mode
+                ? "cursor-not-allowed opacity-50"
+                : ""
             }`}>
             Confirm
           </button>

@@ -21,7 +21,7 @@ const PatientInfo = ({ theme }) => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const Id = params.get("userId");
-
+    console.log("id=", Id);
     fetchPatientData(Id);
   }, []);
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Login.module.css";
-import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
+import { FaUser, FaLock, FaEnvelope, FaEyeSlash } from "react-icons/fa";
 import {
   doSignInWithEmailAndPassword,
   doCreateUserWithEmailAndPassword,
@@ -10,6 +10,11 @@ import { auth, db } from "../../firebase/firebase";
 import { setDoc, doc } from "firebase/firestore";
 
 const LoginPage = () => {
+  const [isVisible, setVisible] = useState(false);
+
+  const toggle = () => {
+    setVisible(!isVisible);
+  };
   // Firebase Setup
 
   //login
@@ -105,7 +110,7 @@ const LoginPage = () => {
           </div>
           <div className={styles["input-box"]}>
             <input
-              type="password"
+              type={!isVisible ? "password" : "text"}
               placeholder="Password"
               value={lpassword}
               onChange={(e) => setLPassword(e.target.value)}
@@ -114,9 +119,20 @@ const LoginPage = () => {
             <FaLock className={styles.icon} />
           </div>
 
-          <div className={styles["remember-forgot"]}>
+          {/* <label className="flex justify-end text-[#333] text-[14.5px] mt-[-15px] mb-2">
             <div></div>
-            <a href="#">Forgot password</a>
+            <input
+              type="checkbox"
+              className="w-4 shrink-0 border-gray-200 rounded-sm text-blue-600 focus:ring-blue-500 "
+              onClick={toggle}
+            />
+            <span>Show password</span>
+          </label> */}
+
+          <div className={styles["remember-forgot"]}>
+            <label>
+              <input onClick={toggle} type="checkbox" /> Show password
+            </label>
           </div>
 
           <button type="submit">Login</button>
@@ -124,9 +140,7 @@ const LoginPage = () => {
           <div className={styles["register-link"]}>
             <p>
               Don't have an account?{" "}
-              <a
-                href="#"
-                onClick={registerLink}>
+              <a href="#" onClick={registerLink}>
                 Register
               </a>
             </p>
@@ -183,11 +197,8 @@ const LoginPage = () => {
 
           <div className={styles["remember-forgot"]}>
             <label>
-              <input
-                type="checkbox"
-                required
-              />{" "}
-              I agree to the termes & conditions
+              <input type="checkbox" required /> I agree to the termes &
+              conditions
             </label>
           </div>
 
@@ -196,9 +207,7 @@ const LoginPage = () => {
           <div className={styles["register-link"]}>
             <p>
               Already have an account?{" "}
-              <a
-                href="#"
-                onClick={loginLink}>
+              <a href="#" onClick={loginLink}>
                 Login
               </a>
             </p>

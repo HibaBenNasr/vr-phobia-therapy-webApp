@@ -5,8 +5,17 @@ import { onValue, ref, update } from "firebase/database";
 import StartSessionModal from "./StartSessionModal";
 import SessionControls from "./SessionControls";
 import { startNewSession, endSessionData } from "./utils/sessionHelpers";
+import Charts from "./Charts";
+import { useSearchParams } from "react-router-dom";
 
 const MainPatientLayout = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    // Change 'interface' param automatically on mount
+    searchParams.set("interface", "MainPatientLayout");
+    setSearchParams(searchParams);
+  }, []); // empty dependency array = runs once on mount
+
   const [patientData, setPatientData] = useState([]);
   const [newSession, setNewSession] = useState({
     Scene: "",
@@ -21,6 +30,8 @@ const MainPatientLayout = () => {
   const [loading, setLoading] = useState(true);
   const [currentLevel, setCurrentLevel] = useState(-2);
   const [currentMode, setCurrentMode] = useState("");
+  const [isOnline, setIsOnline] = useState(false);
+  const [lastOnline, setLastOnline] = useState(null);
 
   const phobias = ["Glossophobia 1", "Glossophobia 2"];
   const levels = [0, 1, 2, 3, 4, 5];
@@ -57,6 +68,8 @@ const MainPatientLayout = () => {
 
     const unsubscribe = onValue(equipRef, (snapshot) => {
       setEquipStat(snapshot.val());
+      setLastOnline(snapshot.val().sensors_ready.last_online);
+      console.log(snapshot.val());
       setLoading(false);
     });
 
@@ -70,6 +83,25 @@ const MainPatientLayout = () => {
     };
   }, []);
 
+  const isRecentlyOnline = (lastOnlineTimestamp) => {
+    const now = Date.now();
+    const lastOnlineMs = Number(lastOnlineTimestamp) * 1000;
+    return now - lastOnlineMs < 20000;
+  };
+
+  // Poll every second to check freshness
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (lastOnline) {
+        const status = isRecentlyOnline(lastOnline);
+        setIsOnline(status);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [lastOnline]);
+
+  //set session id
   useEffect(() => {
     if (sessionStat?.start_session && sessionStat?.session_id) {
       setSessionID(sessionStat.session_id);
@@ -77,6 +109,12 @@ const MainPatientLayout = () => {
       setSessionID(""); // Optional: clear sessionID if session ends
     }
   }, [sessionStat]);
+
+  useEffect(() => {
+    if (sessionStat?.start_session === false) {
+      handleEndSession(); // Reuse logic, handles errors
+    }
+  }, [sessionStat?.start_session]);
 
   // Fetch session details (sessionID, currentLevel, mode) from DB continuously
   useEffect(() => {
@@ -143,7 +181,7 @@ const MainPatientLayout = () => {
       try {
         await endSessionData(patientID, sessionID, currentLevel);
         setNewSession({ Scene: "", InitialLevel: -2, Mode: "" });
-        setPatientID("");
+        // setPatientID("");
         setSessionID("");
         setCurrentLevel(-2);
       } catch (err) {
@@ -234,7 +272,7 @@ const MainPatientLayout = () => {
         }}
         currentLevel={currentLevel}
         onToggleMode={onToggleMode}
-        sensorsOn={equipStat?.sensors_ready}
+        sensorsOn={isRecentlyOnline(lastOnline)}
         mode={currentMode}
       />
 
@@ -244,11 +282,16 @@ const MainPatientLayout = () => {
         onConfirm={handleStartSession}
         newSession={newSession}
         setNewSession={setNewSession}
-        equipStat={equipStat}
+        headStat={equipStat.headset_ready}
+        sensorStat={isRecentlyOnline(lastOnline)}
         phobias={phobias}
         levels={levels}
         onModeToggle={onToggleMode}
       />
+      <div className="mb-3">
+        {" "}
+        <Charts sessionStat={sessionStat} />
+      </div>
 
       <div className="flex flex-row mb-3">
         <div className="pt-1 px-1 basis-1/3 flex flex-col bg-white dark:bg-gray-800 shadow-xs rounded-xl mr-3">
@@ -261,7 +304,9 @@ const MainPatientLayout = () => {
             <hr />
             <p className="text-center flex items-center justify-between">
               Sensors:{" "}
-              <span>{equipStat.sensors_ready ? "Ready" : "Not Ready"}</span>
+              <span>
+                {isRecentlyOnline(lastOnline) ? "Ready" : "Not Ready"}
+              </span>
             </p>
           </div>
         </div>

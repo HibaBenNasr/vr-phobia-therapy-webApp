@@ -38,7 +38,6 @@ const FinalStep = () => {
       MedicalCondition: userData["MedicalCondition"] == "true",
       MedicalConditionDetails: userData["MedicalConditionDetails"],
       Created: new Date(),
-      NumberOfSessions: 0,
       Description: "",
     };
 
@@ -134,9 +133,7 @@ const FinalStep = () => {
             <>Wait for a moment</>
           )}
         </div>
-        <a
-          href="/MainDashboard"
-          className="mt-10">
+        <a href="/MainDashboard" className="mt-10">
           <button
             className="h-10 px-5 text-green-700 transition-colors duration-150 border border-gray-300 rounded-lg focus:shadow-outline hover:bg-green-500 hover:text-green-100"
             hidden={!(status == "success")}>

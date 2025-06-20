@@ -49,7 +49,7 @@ const MainDashboard = () => {
   //end theme
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-500 p-3">
+    <div className="bg-gray-100 dark:bg-gray-900 p-3">
       <div className="flex">
         <Sidebar
           expanded={sidebarExpanded}
@@ -66,13 +66,6 @@ const MainDashboard = () => {
             text="Calendar"
             active={activeItem == "CalendarLayout"}
             onClick={() => handleSidebarItemClick("CalendarLayout")}
-            alert
-          />
-          <SidebarItem
-            icon={<FaNotesMedical />}
-            text="Notes"
-            active={activeItem == "Notes"}
-            onClick={() => handleSidebarItemClick("Notes")}
           />
 
           <SidebarItem
@@ -94,8 +87,6 @@ const MainDashboard = () => {
             <Patients theme={theme} />
           ) : activeItem == "CalendarLayout" ? (
             <CalendarLayout />
-          ) : activeItem == "Notes" ? (
-            <ToDo theme={theme} />
           ) : activeItem == "Profile" ? (
             <Profile theme={theme} />
           ) : (

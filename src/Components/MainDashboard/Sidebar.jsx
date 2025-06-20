@@ -42,19 +42,15 @@ export default function Sidebar({ expanded, setExpanded, theme, children }) {
 
   return (
     <div
-      className={`fixed left-0 top-0 z-10 h-screen border-r pt-4 px-4 transition-all duration-300 ${
+      className={`fixed left-0 top-0 z-10 h-screen border-r pt-4 px-4 transition-all duration-300 bg-white dark:bg-sky-900 ${
         expanded ? "w-16 md:w-56" : "w-16"
-      } ${theme == "light" ? "bg-white" : "bg-sky-900"} `}>
+      } `}>
       {/* logo */}
       <div className="mb-8x">
         {expanded ? (
           <>
             <div className="md:flex justify-between">
-              <img
-                src="/logo.png"
-                alt="logo"
-                className="w-32 hidden md:flex"
-              />
+              <img src="/logo.png" alt="logo" className="w-32 hidden md:flex" />
               <img
                 src="/mini-logo.png"
                 alt="logo"
@@ -62,7 +58,7 @@ export default function Sidebar({ expanded, setExpanded, theme, children }) {
               />{" "}
               <button
                 onClick={() => setExpanded((curr) => !curr)}
-                className="mt-3  p-2 rounded-lg bg-white hover:bg-gray-100">
+                className="mt-3  p-2 rounded-lg bg-white  dark:bg-sky-900 hover:bg-gray-100 hover:dark:bg-white ">
                 {expanded ? <LuChevronFirst /> : <LuChevronLast />}
               </button>
             </div>
@@ -72,7 +68,7 @@ export default function Sidebar({ expanded, setExpanded, theme, children }) {
             <img
               src="/mini-logo.png"
               alt="logo"
-              className="w-8 flex"
+              className="w-8 flex dark:bg-white"
             />
             <button
               onClick={() => setExpanded((curr) => !curr)}

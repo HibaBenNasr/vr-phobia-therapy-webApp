@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ImArrowDown, ImArrowUp } from "react-icons/im";
 import ToggleSwitch from "./ToggleSwitch";
 
@@ -13,13 +13,34 @@ const SessionControls = ({
   sensorsOn,
   mode,
 }) => {
+  const [secondsElapsed, setSecondsElapsed] = useState(0);
+  useEffect(() => {
+    let interval = null;
+    if (sessionStat.start_session) {
+      interval = setInterval(() => {
+        setSecondsElapsed((prev) => prev + 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+      setSecondsElapsed(0);
+    }
+    return () => clearInterval(interval);
+  }, [sessionStat.start_session]);
+
+  const formatTime = (sec) => {
+    const minutes = Math.floor(sec / 60)
+      .toString()
+      .padStart(2, "0");
+    const seconds = (sec % 60).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  };
   return (
     <div className="flex flex-row mb-3 h-full">
       <div className="w-full bg-white mr-2 flex items-center justify-around dark:bg-gray-800 shadow-xs rounded-xl">
         {/* Start Button */}
         <button
           className={`m-2 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-2/5 sm:w-auto px-2 py-2.5 text-center dark:bg-green-600 dark:hover:bg-blue-700 dark:focus:ring-green-800 ${
-            sessionStat.start_session ? "disabled" : ""
+            sessionStat.start_session ? "disabled cursor-not-allowed" : ""
           }`}
           onClick={onStartClick}
           disabled={sessionStat.start_session}>
@@ -29,7 +50,7 @@ const SessionControls = ({
         {/* End Button */}
         <button
           className={`m-2 text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-2/5 sm:w-auto px-2 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 ${
-            !sessionStat.start_session ? "disabled" : ""
+            !sessionStat.start_session ? "disabled cursor-not-allowed" : ""
           }`}
           onClick={onEndClick}
           disabled={!sessionStat.start_session}>
@@ -66,7 +87,8 @@ const SessionControls = ({
         </div>
 
         {/* Toggle */}
-        <div className="w-1/5">
+
+        <div className="w-1/5 flex items-center justify-center space-x-6">
           <ToggleSwitch
             labelOn="auto"
             labelOff="manual"
@@ -74,6 +96,11 @@ const SessionControls = ({
             sensorsOn={sensorsOn}
             currentMode={mode}
           />
+          {sessionStat.start_session && (
+            <span className="bg-black text-green-400 font-mono text-lg px-3 py-1 rounded-md shadow-inner">
+              {formatTime(secondsElapsed)}
+            </span>
+          )}
         </div>
       </div>
     </div>

@@ -13,9 +13,19 @@ import History from "./History/History";
 import PatientInfo from "./PatientInfo/PatientInfo";
 
 const PatientDashboard = () => {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const item = params.get("interface");
+    const Id = params.get("userId");
+    if (item == "PatientInfo") {
+      handlePatientSidebarItemClick("PatientInfo");
+    } else {
+      handlePatientSidebarItemClick("MainPatientLayout");
+    }
+  }, []);
+
   //manage sidebar items
-  const [activeItemPatient, setActiveItemPatient] =
-    useState("MainPatientLayout"); // Track active item
+  const [activeItemPatient, setActiveItemPatient] = useState(""); // Track active item
 
   const handlePatientSidebarItemClick = (item) => {
     setActiveItemPatient(item); // Update active item when clicked
@@ -30,18 +40,18 @@ const PatientDashboard = () => {
 
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
-  useEffect(() => {
-    localStorage.setItem("currentTheme", theme);
-  }, [theme]);
-  //end theme
+  // useEffect(() => {
+  //   localStorage.setItem("currentTheme", theme);
+  // }, [theme]);
+  // //end theme
 
-  useEffect(() => {
-    if (theme == "light") {
-      document.documentElement.classList.remove("dark");
-    } else {
-      document.documentElement.classList.add("dark");
-    }
-  }, [theme]);
+  // useEffect(() => {
+  //   if (theme == "light") {
+  //     document.documentElement.classList.remove("dark");
+  //   } else {
+  //     document.documentElement.classList.add("dark");
+  //   }
+  // }, [theme]);
 
   return (
     <div className="bg-gray-100 dark:bg-gray-500 p-3">
@@ -61,7 +71,6 @@ const PatientDashboard = () => {
             text="History"
             active={activeItemPatient == "History"}
             onClick={() => handlePatientSidebarItemClick("History")}
-            alert
           />
           <PatientSidebarItem
             icon={<FaNotesMedical />}

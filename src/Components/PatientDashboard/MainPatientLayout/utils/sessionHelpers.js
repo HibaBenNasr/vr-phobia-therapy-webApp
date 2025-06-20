@@ -53,6 +53,7 @@ export const startNewSession = async (
     patient_id: patientID,
     start_time: startTime,
     therapist_id: user.uid,
+    stress_state: "neutral",
     level_transitions: {
       [startTime]: {
         mode: currentMode,
