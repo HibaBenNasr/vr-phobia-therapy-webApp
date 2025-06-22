@@ -7,14 +7,15 @@ import SessionControls from "./SessionControls";
 import { startNewSession, endSessionData } from "./utils/sessionHelpers";
 import Charts from "./Charts";
 import { useSearchParams } from "react-router-dom";
+import { FaCheckCircle } from "react-icons/fa";
+import { CgUnavailable } from "react-icons/cg";
 
 const MainPatientLayout = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   useEffect(() => {
-    // Change 'interface' param automatically on mount
     searchParams.set("interface", "MainPatientLayout");
     setSearchParams(searchParams);
-  }, []); // empty dependency array = runs once on mount
+  }, []);
 
   const [patientData, setPatientData] = useState([]);
   const [newSession, setNewSession] = useState({
@@ -33,7 +34,7 @@ const MainPatientLayout = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [lastOnline, setLastOnline] = useState(null);
 
-  const phobias = ["Glossophobia 1", "Glossophobia 2"];
+  const phobias = ["Glossophobia 1", "Acrophobia"];
   const levels = [0, 1, 2, 3, 4, 5];
 
   // Fetch patient data
@@ -69,7 +70,6 @@ const MainPatientLayout = () => {
     const unsubscribe = onValue(equipRef, (snapshot) => {
       setEquipStat(snapshot.val());
       setLastOnline(snapshot.val().sensors_ready.last_online);
-      console.log(snapshot.val());
       setLoading(false);
     });
 
@@ -95,6 +95,9 @@ const MainPatientLayout = () => {
       if (lastOnline) {
         const status = isRecentlyOnline(lastOnline);
         setIsOnline(status);
+        if (!status && sessionID && currentMode === "auto") {
+          onToggleMode("manual");
+        }
       }
     }, 1000);
 
@@ -160,11 +163,10 @@ const MainPatientLayout = () => {
             newSession,
             setSessionID,
             setCurrentLevel,
-            currentMode
+            newSession.Mode
           );
           // console.log("newSession.Mode", newSession.Mode);
-          // setCurrentMode(newSession.Mode);
-          // console.log("current mode ", currentMode);
+          setCurrentMode(newSession.Mode);
           setNewSession({ Scene: "", InitialLevel: -2, Mode: "" });
         } catch (err) {
           console.error("Failed to start session", err);
@@ -188,7 +190,7 @@ const MainPatientLayout = () => {
         console.error("Failed to end session", err);
       }
     } else {
-      console.log("Missing patient or session ID");
+      // console.log("Missing patient or session ID");
     }
   };
 
@@ -240,7 +242,7 @@ const MainPatientLayout = () => {
 
     const checkHeadsetStatus = () => {
       if (equipStat?.headset_ready === false) {
-        console.warn("Headset disconnected. Ending session...");
+        console.log("Headset disconnected. Ending session...");
         handleEndSession(); // Call your session-ending logic
       }
     };
@@ -250,8 +252,8 @@ const MainPatientLayout = () => {
 
   // Handle mode toggle
   const onToggleMode = (modeChosen) => {
-    setCurrentMode(equipStat?.sensors_ready ? modeChosen : "manual"); // Update local state
-    updateModeInDB(equipStat?.sensors_ready ? modeChosen : "manual"); // Update Firebase
+    setCurrentMode(isRecentlyOnline(lastOnline) ? modeChosen : "manual"); // Update local state
+    updateModeInDB(isRecentlyOnline(lastOnline) ? modeChosen : "manual"); // Update Firebase
   };
 
   if (loading) {
@@ -299,13 +301,23 @@ const MainPatientLayout = () => {
           <div className="p-2 mb-1">
             <p className="text-center flex items-center justify-between">
               VR Headset:{" "}
-              <span>{equipStat.headset_ready ? "Ready" : "Not Ready"}</span>
+              <span>
+                {equipStat.headset_ready ? (
+                  <FaCheckCircle size={20} color="green" />
+                ) : (
+                  <CgUnavailable size={20} color="red" />
+                )}
+              </span>
             </p>
             <hr />
             <p className="text-center flex items-center justify-between">
               Sensors:{" "}
               <span>
-                {isRecentlyOnline(lastOnline) ? "Ready" : "Not Ready"}
+                {isRecentlyOnline(lastOnline) ? (
+                  <FaCheckCircle size={20} color="green" />
+                ) : (
+                  <CgUnavailable size={20} color="red" />
+                )}
               </span>
             </p>
           </div>

@@ -67,7 +67,8 @@ export const startNewSession = async (
 
   setSessionID(sessionId);
   setCurrentLevel(newSession.InitialLevel);
-  //   setCurrentMode(newSession.Mode);
+  console.log("helper func ", currentMode);
+  // setCurrentMode(newSession.Mode);
 
   return sessionId;
 };

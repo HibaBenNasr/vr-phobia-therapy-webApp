@@ -35,8 +35,6 @@ const Charts = ({ sessionStat }) => {
   const [timestamps, setTimestamps] = useState([]);
   const [bpmValues, setBpmValues] = useState([]);
   const [bpmColors, setBpmColors] = useState([]);
-  const [transitionLabels, setTransitionLabels] = useState([]);
-  const [transitionCounts, setTransitionCounts] = useState([]);
 
   const [levelTimestamps, setLevelTimestamps] = useState([]);
   const [levelData2, setLevelData] = useState([]);
@@ -152,7 +150,6 @@ const Charts = ({ sessionStat }) => {
       },
     },
   };
-  // to remove
 
   // Convert timestamps to readable format
   const formatTime = (timestamp) => {
@@ -183,19 +180,6 @@ const Charts = ({ sessionStat }) => {
         data: levelData2,
         borderColor: "#FFA07A",
         backgroundColor: levelColors,
-      },
-    ],
-  };
-
-  // end to remove
-  const bpmChartData = {
-    labels: ["10:00", "10:05", "10:10"],
-    datasets: [
-      {
-        label: "BPM",
-        data: [80, 100, 120],
-        borderColor: "#87CEFA",
-        backgroundColor: "#87CEFA",
       },
     ],
   };

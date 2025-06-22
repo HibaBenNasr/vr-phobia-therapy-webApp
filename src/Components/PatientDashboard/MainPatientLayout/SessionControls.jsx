@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { ImArrowDown, ImArrowUp } from "react-icons/im";
 import ToggleSwitch from "./ToggleSwitch";
+import { get, ref } from "firebase/database";
+import { RTdatabase, db } from "../../../firebase/firebase";
 
 const SessionControls = ({
   sessionStat,
@@ -16,14 +18,44 @@ const SessionControls = ({
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   useEffect(() => {
     let interval = null;
-    if (sessionStat.start_session) {
-      interval = setInterval(() => {
-        setSecondsElapsed((prev) => prev + 1);
-      }, 1000);
-    } else {
-      clearInterval(interval);
-      setSecondsElapsed(0);
-    }
+
+    const startTimerFromFirebase = async () => {
+      if (sessionStat.start_session && sessionStat.session_id) {
+        const startTimeRef = ref(
+          RTdatabase,
+          `sessions/${sessionStat.session_id}/start_time`
+        );
+
+        try {
+          const snapshot = await get(startTimeRef);
+          if (snapshot.exists()) {
+            const startTimestamp = snapshot.val(); // 10-digit UNIX timestamp in seconds
+            const now = Math.floor(Date.now() / 1000);
+            setSecondsElapsed(now - startTimestamp);
+
+            interval = setInterval(() => {
+              setSecondsElapsed((prev) => prev + 1);
+            }, 1000);
+          }
+        } catch (error) {
+          console.error("Error fetching start time from Firebase:", error);
+        }
+      } else {
+        clearInterval(interval);
+        setSecondsElapsed(0);
+      }
+    };
+
+    startTimerFromFirebase();
+
+    // if (sessionStat.start_session) {
+    //   interval = setInterval(() => {
+    //     setSecondsElapsed((prev) => prev + 1);
+    //   }, 1000);
+    // } else {
+    //   clearInterval(interval);
+    //   setSecondsElapsed(0);
+    // }
     return () => clearInterval(interval);
   }, [sessionStat.start_session]);
 
