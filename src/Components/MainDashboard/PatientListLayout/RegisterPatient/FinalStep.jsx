@@ -38,7 +38,6 @@ const FinalStep = () => {
       MedicalCondition: userData["MedicalCondition"] == "true",
       MedicalConditionDetails: userData["MedicalConditionDetails"],
       Created: new Date(),
-      Description: "",
     };
 
     try {

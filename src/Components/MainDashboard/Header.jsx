@@ -1,14 +1,8 @@
 import React from "react";
-import { FaUserCircle } from "react-icons/fa";
-import { GoBell } from "react-icons/go";
 import { LuLogOut, LuMoon, LuSun } from "react-icons/lu";
-import { MdLightMode, MdDarkMode } from "react-icons/md";
 import { doSignOut } from "../../firebase/auth";
 
-const Header = ({ theme, setTheme, expanded }) => {
-  const toggleMode = () => {
-    theme == "light" ? setTheme("dark") : setTheme("light");
-  };
+const Header = ({ setTheme, expanded, activeItem }) => {
   const darkMode = () => {
     setTheme("dark");
   };
@@ -23,9 +17,15 @@ const Header = ({ theme, setTheme, expanded }) => {
         expanded ? "left-16 md:left-56" : "left-16"
       }`}>
       <div></div>
-      <div className="text-center">
-        {/* <p className="text-xl font-semibold">Manage Patients</p>
-        <h1 className="text-xs">Section </h1> */}
+      <div className="text-center dark:text-white">
+        <p className="text-xl font-semibold">
+          {activeItem == "Patients"
+            ? "Manage Patients"
+            : activeItem == "CalendarLayout"
+            ? "Calendar"
+            : "Profile"}
+        </p>
+        <h1 className="text-xs">Section </h1>
       </div>
       <div className="flex items-center space-x-5">
         <div className="flex">

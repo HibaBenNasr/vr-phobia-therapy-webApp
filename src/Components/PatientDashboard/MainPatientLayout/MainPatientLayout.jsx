@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { auth, db, RTdatabase } from "../../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { onValue, ref, update } from "firebase/database";
@@ -33,8 +33,9 @@ const MainPatientLayout = () => {
   const [currentMode, setCurrentMode] = useState("");
   const [isOnline, setIsOnline] = useState(false);
   const [lastOnline, setLastOnline] = useState(null);
+  const [stressLevel, setStressLevel] = useState(null);
 
-  const phobias = ["Glossophobia 1", "Acrophobia"];
+  const phobias = ["Glossophobia", "Acrophobia"];
   const levels = [0, 1, 2, 3, 4, 5];
 
   // Fetch patient data
@@ -109,13 +110,13 @@ const MainPatientLayout = () => {
     if (sessionStat?.start_session && sessionStat?.session_id) {
       setSessionID(sessionStat.session_id);
     } else {
-      setSessionID(""); // Optional: clear sessionID if session ends
+      setSessionID("");
     }
   }, [sessionStat]);
 
   useEffect(() => {
     if (sessionStat?.start_session === false) {
-      handleEndSession(); // Reuse logic, handles errors
+      handleEndSession();
     }
   }, [sessionStat?.start_session]);
 
@@ -129,11 +130,11 @@ const MainPatientLayout = () => {
       const data = snapshot.val();
       if (data) {
         setCurrentLevel(data.current_level);
-        setCurrentMode(data.mode); // Sync mode from Firebase
+        setCurrentMode(data.mode);
       }
     });
 
-    return () => unsubscribe(); // Clean up listener on unmount
+    return () => unsubscribe();
   }, [sessionID]);
 
   useEffect(() => {
@@ -148,7 +149,7 @@ const MainPatientLayout = () => {
       }
     });
 
-    return () => unsubscribe(); // cleanup when sessionID changes or component unmounts
+    return () => unsubscribe();
   }, [sessionID]);
 
   // Start session
@@ -165,9 +166,9 @@ const MainPatientLayout = () => {
             setCurrentLevel,
             newSession.Mode
           );
-          // console.log("newSession.Mode", newSession.Mode);
           setCurrentMode(newSession.Mode);
           setNewSession({ Scene: "", InitialLevel: -2, Mode: "" });
+          addLog("Session started");
         } catch (err) {
           console.error("Failed to start session", err);
         }
@@ -186,6 +187,7 @@ const MainPatientLayout = () => {
         // setPatientID("");
         setSessionID("");
         setCurrentLevel(-2);
+        addLog("Session ended");
       } catch (err) {
         console.error("Failed to end session", err);
       }
@@ -243,7 +245,10 @@ const MainPatientLayout = () => {
     const checkHeadsetStatus = () => {
       if (equipStat?.headset_ready === false) {
         console.log("Headset disconnected. Ending session...");
+        addLog("Headset disconnected. Ending session...");
         handleEndSession(); // Call your session-ending logic
+      } else {
+        addLog("Headset connected");
       }
     };
 
@@ -252,16 +257,101 @@ const MainPatientLayout = () => {
 
   // Handle mode toggle
   const onToggleMode = (modeChosen) => {
+    const currMode = currentMode;
     setCurrentMode(isRecentlyOnline(lastOnline) ? modeChosen : "manual"); // Update local state
     updateModeInDB(isRecentlyOnline(lastOnline) ? modeChosen : "manual"); // Update Firebase
+    addLog(
+      `Mode changed to ${isRecentlyOnline(lastOnline) ? modeChosen : "manual"}`
+    );
   };
+
+  // Sensor availability change
+  useEffect(() => {
+    if (sessionID) {
+      addLog(
+        `Sensors are ${
+          isRecentlyOnline(lastOnline) ? "available" : "unavailable"
+        }`
+      );
+    }
+  }, [isRecentlyOnline(lastOnline)]);
+
+  // Track level changes
+  const [prevLevel, setPrevLevel] = useState(-2);
+  useEffect(() => {
+    if (sessionID && currentLevel !== prevLevel) {
+      addLog(`Level changed to ${currentLevel}`);
+      setPrevLevel(currentLevel);
+    }
+  }, [currentLevel]);
+
+  //Track stress level
+  useEffect(() => {
+    if (!sessionID) return;
+
+    const stressRef = ref(RTdatabase, `sessions/${sessionID}/stress_state`);
+    const unsubscribe = onValue(stressRef, (snapshot) => {
+      const value = snapshot.val();
+      if (value !== null) {
+        setStressLevel(value);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [sessionID]);
+
+  const getColorClass = (level) => {
+    switch (level) {
+      case "very high":
+        return "bg-red-600 animate-pulse";
+      case "high":
+        return "bg-orange-500 animate-pulse";
+      case "neutral":
+        return "bg-green-600 animate-pulse";
+      default:
+        return "bg-gray-400";
+    }
+  };
+
+  //Track notes
+  const [lastNoteTimestamp, setLastNoteTimestamp] = useState(null);
+
+  useEffect(() => {
+    if (!sessionID) return;
+
+    const notesRef = ref(RTdatabase, `sessions/${sessionID}/notes`);
+    const unsubscribe = onValue(notesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const timestamps = Object.keys(data).map(Number);
+        const latest = Math.max(...timestamps);
+
+        if (latest !== lastNoteTimestamp) {
+          setLastNoteTimestamp(latest);
+          addLog(`Note: ${data[latest]}`);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [sessionID, lastNoteTimestamp]);
+
+  const logEndRef = useRef(null);
+  const [logs, setLogs] = useState([]);
+  const addLog = (msg) => {
+    setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
+  };
+
+  useEffect(() => {
+    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="p-1 mt-14">
+    <div className="p-1 mt-14 ">
       <SessionControls
         sessionStat={sessionStat}
         onStartClick={() => setModelVisible(true)}
@@ -295,11 +385,14 @@ const MainPatientLayout = () => {
         <Charts sessionStat={sessionStat} />
       </div>
 
-      <div className="flex flex-row mb-3">
-        <div className="pt-1 px-1 basis-1/3 flex flex-col bg-white dark:bg-gray-800 shadow-xs rounded-xl mr-3">
-          <div className="text-center p-2 mb-1">Equipment Availability</div>
+      <div className="flex flex-row mb-3 w-full">
+        {/* equipment availability  */}
+        <div className="pt-1 px-1 basis-1/3 min-w-0 flex flex-col bg-white dark:bg-sky-900 shadow-xs rounded-xl mr-3">
+          <div className="text-center p-2 mb-1 dark:text-white">
+            Equipment Availability
+          </div>
           <div className="p-2 mb-1">
-            <p className="text-center flex items-center justify-between">
+            <p className="text-center flex items-center justify-between dark:text-white">
               VR Headset:{" "}
               <span>
                 {equipStat.headset_ready ? (
@@ -310,7 +403,7 @@ const MainPatientLayout = () => {
               </span>
             </p>
             <hr />
-            <p className="text-center flex items-center justify-between">
+            <p className="text-center flex items-center justify-between dark:text-white">
               Sensors:{" "}
               <span>
                 {isRecentlyOnline(lastOnline) ? (
@@ -322,7 +415,43 @@ const MainPatientLayout = () => {
             </p>
           </div>
         </div>
-        <div className="pt-2 basis-2/3 bg-white flex flex-col dark:bg-gray-800 shadow-xs rounded-xl mr-3"></div>
+        {/* end equipment availability  */}
+
+        {/* live session log  */}
+        <div className="pt-2 px-1 basis-1/3 min-w-0 bg-white flex flex-col dark:bg-sky-900 shadow-xs rounded-xl mr-3">
+          <div className="text-center text-m font-semibold px-4 py-1 border-b dark:border-white dark:text-white">
+            Live Session Logs
+          </div>
+          <div className="text-sm flex-1 px-4 py-2 mb-3 overflow-y-auto max-h-24 space-y-2">
+            {logs.map((log, idx) => (
+              <div key={idx} className="text-sky-900 dark:text-gray-200">
+                {log}
+              </div>
+            ))}
+            <div ref={logEndRef} />
+          </div>
+        </div>
+        {/* end live session log  */}
+
+        {/* stress state card  */}
+        <div className=" basis-1/3 min-w-0 bg-white flex flex-col dark:bg-sky-900 shadow-xs rounded-xl mr-3">
+          <div
+            className={` p-4 rounded-xl shadow-md  h-full text-white transition-all duration-300 ease-in-out ${
+              sessionStat?.start_session
+                ? getColorClass(stressLevel)
+                : "bg-gray-500"
+            }`}>
+            <div className="text-lg font-semibold mb-1">Stress Level</div>
+            <div className="text-2xl tracking-wide">
+              {sessionStat?.start_session
+                ? stressLevel
+                  ? stressLevel.replace("_", " ").toUpperCase()
+                  : "Loading..."
+                : "Session not started"}
+            </div>
+          </div>
+        </div>
+        {/* end stress state card  */}
       </div>
     </div>
   );

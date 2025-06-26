@@ -2,14 +2,9 @@ import Header from "./Header";
 import Patients from "./PatientListLayout/Patients";
 import Sidebar, { SidebarItem } from "./Sidebar";
 import React, { useEffect, useState } from "react";
-import {
-  FaRegListAlt,
-  FaCalendarAlt,
-  FaNotesMedical,
-  FaUserCircle,
-} from "react-icons/fa";
+import { FaRegListAlt, FaCalendarAlt, FaUserCircle } from "react-icons/fa";
 import CalendarLayout from "./CalendarLayout/CalendarLayout";
-import ToDo from "./ToDoLayout/ToDo";
+import Profile from "./Profile/Profile";
 
 const MainDashboard = () => {
   //manage sidebar items
@@ -47,14 +42,10 @@ const MainDashboard = () => {
     }
   }, [theme]);
   //end theme
-
   return (
     <div className="bg-gray-100 dark:bg-gray-900 p-3">
       <div className="flex">
-        <Sidebar
-          expanded={sidebarExpanded}
-          setExpanded={setSidebarExpanded}
-          theme={theme}>
+        <Sidebar expanded={sidebarExpanded} setExpanded={setSidebarExpanded}>
           <SidebarItem
             icon={<FaRegListAlt />}
             text="Patients"
@@ -76,19 +67,21 @@ const MainDashboard = () => {
           />
         </Sidebar>
         <div
-          className={`w-full ${sidebarExpanded ? "ml-16 md:ml-56" : "ml-16"}`}>
+          className={`w-full  h-full ${
+            sidebarExpanded ? "ml-16 md:ml-56" : "ml-16"
+          }`}>
           <Header
-            theme={theme}
             setTheme={setTheme}
             expanded={sidebarExpanded}
+            activeItem={activeItem}
           />
 
           {activeItem == "Patients" ? (
-            <Patients theme={theme} />
+            <Patients />
           ) : activeItem == "CalendarLayout" ? (
             <CalendarLayout />
           ) : activeItem == "Profile" ? (
-            <Profile theme={theme} />
+            <Profile />
           ) : (
             <div className="p-5 mt-16">
               <h1>Unknown status</h1>

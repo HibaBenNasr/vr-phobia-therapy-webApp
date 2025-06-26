@@ -1,23 +1,8 @@
 import React from "react";
-import { BiLogOut, BiLogOutCircle } from "react-icons/bi";
-import { FaUserCircle } from "react-icons/fa";
-import { GoBell } from "react-icons/go";
 import { LuLogOut, LuMoon, LuSun } from "react-icons/lu";
-
-import {
-  MdLightMode,
-  MdDarkMode,
-  MdOutlineDarkMode,
-  MdOutlineLightMode,
-  MdLogout,
-} from "react-icons/md";
 import { doSignOut } from "../../firebase/auth";
 
-const PatientHeader = ({ theme, setTheme, expanded }) => {
-  const toggleMode = () => {
-    theme == "light" ? setTheme("dark") : setTheme("light");
-  };
-
+const PatientHeader = ({ setTheme, expanded, activeItemPatient }) => {
   const darkMode = () => {
     setTheme("dark");
   };
@@ -34,8 +19,14 @@ const PatientHeader = ({ theme, setTheme, expanded }) => {
         {/* <h1 className="text-xs">Patient </h1>
         <p className="text-xl font-semibold"> Section</p> */}
       </div>
-      <div className="text-center">
-        <p className="text-xl font-semibold">Manage Session</p>
+      <div className="text-center dark:text-white">
+        <p className="text-xl font-semibold">
+          {activeItemPatient == "MainPatientLayout"
+            ? "Manage Session"
+            : activeItemPatient == "History"
+            ? "History"
+            : "Patient Infonformation"}
+        </p>
         <h1 className="text-xs">Section </h1>
       </div>
       <div className="flex items-center space-x-5">

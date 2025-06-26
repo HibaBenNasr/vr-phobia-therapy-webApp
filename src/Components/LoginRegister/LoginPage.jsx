@@ -5,7 +5,7 @@ import {
   doSignInWithEmailAndPassword,
   doCreateUserWithEmailAndPassword,
 } from "../../firebase/auth";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { auth, db } from "../../firebase/firebase";
 import { setDoc, doc } from "firebase/firestore";
 
@@ -135,7 +135,11 @@ const LoginPage = () => {
             </label>
           </div>
 
-          <button type="submit">Login</button>
+          <button
+            className="w-full h-[45px] bg-gradient-to-r from-[#007bff] to-[#2217c5] border-0 outline-none rounded-[10px] shadow-md cursor-pointer text-white font-bold text-[16px]"
+            type="submit">
+            Login
+          </button>
 
           <div className={styles["register-link"]}>
             <p>
@@ -202,7 +206,11 @@ const LoginPage = () => {
             </label>
           </div>
 
-          <button type="submit">Register</button>
+          <button
+            className="w-full h-[45px] bg-gradient-to-r from-[#007bff] to-[#2217c5] border-0 outline-none rounded-[10px] shadow-md cursor-pointer text-white font-bold text-[16px]"
+            type="submit">
+            Register
+          </button>
 
           <div className={styles["register-link"]}>
             <p>

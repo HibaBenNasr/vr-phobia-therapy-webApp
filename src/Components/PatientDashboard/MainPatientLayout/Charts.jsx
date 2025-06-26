@@ -31,6 +31,17 @@ const stressColorMap = {
   "very high": "#FF4500", // Red
 };
 
+const chartBackgroundPlugin = {
+  id: "custom_canvas_background_color",
+  beforeDraw: (chart) => {
+    const ctx = chart.canvas.getContext("2d");
+    ctx.save();
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.fillStyle = isDarkMode ? "#1e293b" : "#ffffff"; // dark or light background
+    ctx.fillRect(0, 0, chart.width, chart.height);
+    ctx.restore();
+  },
+};
 const Charts = ({ sessionStat }) => {
   const [timestamps, setTimestamps] = useState([]);
   const [bpmValues, setBpmValues] = useState([]);
@@ -39,6 +50,7 @@ const Charts = ({ sessionStat }) => {
   const [levelTimestamps, setLevelTimestamps] = useState([]);
   const [levelData2, setLevelData] = useState([]);
   const [levelColors, setLevelColors] = useState([]);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Fetch BPM and stress_level
   useEffect(() => {
@@ -119,38 +131,6 @@ const Charts = ({ sessionStat }) => {
     return () => unsubscribe();
   }, [sessionStat?.start_session, sessionStat?.session_id]);
 
-  const transitionChartOptions = {
-    responsive: true,
-    animation: true,
-    maintainAspectRatio: false,
-    indexAxis: "x",
-    scales: {
-      y: {
-        min: 0,
-        max: 5,
-        beginAtZero: true,
-        title: { display: true, text: "Exposure Level" },
-        ticks: {
-          stepSize: 1,
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        callbacks: {
-          label: function (context) {
-            const index = context.dataIndex;
-            const mode = levelColors[index] === "#FFA500" ? "Manual" : "Auto";
-            return `Level: ${context.raw}, Mode: ${mode}`;
-          },
-        },
-      },
-    },
-  };
-
   // Convert timestamps to readable format
   const formatTime = (timestamp) => {
     const date = new Date(parseInt(timestamp) * 1000);
@@ -185,30 +165,115 @@ const Charts = ({ sessionStat }) => {
   };
 
   const bpmChartOptions = {
+    plugins: {
+      legend: {
+        labels: {
+          color: isDarkMode ? "white" : "black",
+        },
+      },
+    },
+    plugins: [chartBackgroundPlugin],
     responsive: true,
     animation: true,
     maintainAspectRatio: false,
     scales: {
+      x: {
+        ticks: { color: isDarkMode ? "white" : "black" },
+      },
       y: {
-        title: { display: true, text: "Beats Per Minute" },
+        title: {
+          display: true,
+          text: "Beats Per Minute",
+          color: isDarkMode ? "white" : "black",
+        },
+        ticks: { color: isDarkMode ? "white" : "black" },
       },
     },
   };
-  //   console.log("BPM Data:", bpmData);
-  //   console.log("Level Data:", levelData);
+
+  const transitionChartOptions = {
+    responsive: true,
+    animation: true,
+
+    // maintainAspectRatio: false,
+    indexAxis: "x",
+    scales: {
+      x: {
+        ticks: { color: isDarkMode ? "white" : "black" },
+      },
+      y: {
+        min: 0,
+        max: 5,
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: "Exposure Level",
+          color: isDarkMode ? "white" : "black",
+        },
+        ticks: {
+          stepSize: 1,
+          color: isDarkMode ? "white" : "black",
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+        labels: {
+          color: isDarkMode ? "white" : "black",
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            const index = context.dataIndex;
+            const mode = levelColors[index] === "#FFA500" ? "Manual" : "Auto";
+            return `Level: ${context.raw}, Mode: ${mode}`;
+          },
+        },
+        backgroundColor: isDarkMode ? "#1e293b" : "#fff",
+        titleColor: isDarkMode ? "#fff" : "#000",
+        bodyColor: isDarkMode ? "#fff" : "#000",
+      },
+    },
+  };
+
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const darkModeClassExists =
+        document.documentElement.classList.contains("dark");
+      setIsDarkMode(darkModeClassExists);
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="flex flex-row gap-4 h-full">
-      <div className="flex flex-col w-1/2 bg-white mr-2  justify-center dark:bg-gray-800 shadow-xs rounded-xl h-[300px] px-4 py-3">
-        <h2 className="text-lg font-semibold mb-4">BPM Over Time</h2>
-        <div className="w-full h-4/5">
+      <div className="flex flex-col w-1/2 bg-white mr-2  justify-center dark:bg-sky-900 shadow-xs rounded-xl h-[300px] px-4 py-3">
+        <h2 className="text-lg font-semibold mb-4 dark:text-white">
+          BPM Over Time
+        </h2>
+        <div className="w-full h-4/5 border border-gray-300 rounded-lg p-2">
           <Line data={bpmData} options={bpmChartOptions} />
         </div>
       </div>
 
-      <div className="flex flex-col w-1/2 bg-white mr-2  justify-center dark:bg-gray-800 shadow-xs rounded-xl h-[300px] px-4 py-3">
-        <h2 className="text-lg font-semibold mb-4">Level Transitions</h2>
-        <div className="w-full h-4/5">
-          <div className="flex gap-4 ">
+      <div className="flex flex-col w-1/2 bg-white mr-2  justify-center dark:bg-sky-900 shadow-xs rounded-xl h-[300px] px-4 py-3">
+        <h2 className="text-lg font-semibold mb-4 dark:text-white">
+          Level Transitions
+        </h2>
+        <div className="w-full h-4/5 border border-gray-300 rounded-lg p-2 pb-10">
+          <div className="flex gap-4 justify-center">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-[#4C51BF] rounded-sm"></div>
               <span className="text-sm text-gray-700 dark:text-gray-300">

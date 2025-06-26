@@ -68,7 +68,7 @@ const SessionControls = ({
   };
   return (
     <div className="flex flex-row mb-3 h-full">
-      <div className="w-full bg-white mr-2 flex items-center justify-around dark:bg-gray-800 shadow-xs rounded-xl">
+      <div className="w-full bg-white mr-2 flex items-center justify-around dark:bg-sky-900 shadow-xs rounded-xl">
         {/* Start Button */}
         <button
           className={`m-2 text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-2/5 sm:w-auto px-2 py-2.5 text-center dark:bg-green-600 dark:hover:bg-blue-700 dark:focus:ring-green-800 ${
@@ -102,7 +102,7 @@ const SessionControls = ({
             aria-label="Level Up">
             <ImArrowUp className="text-l mx-auto" />
           </button>
-          <p className="m-2 p-2.5">
+          <p className="m-2 p-2.5 dark:text-white">
             Level {currentLevel != -2 ? ": " + currentLevel : ""}
           </p>
           <button

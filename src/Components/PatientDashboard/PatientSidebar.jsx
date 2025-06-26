@@ -1,60 +1,40 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { FaBackspace, FaUserCircle } from "react-icons/fa";
 import { LuChevronFirst, LuChevronLast } from "react-icons/lu";
-import { FaSignOutAlt } from "react-icons/fa";
 
-import { auth, db } from "../../firebase/firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { toast } from "react-toastify";
-import { BsBack } from "react-icons/bs";
 import { GrReturn } from "react-icons/gr";
 
 const PatientSidebarContext = createContext();
 
-export default function PatientSidebar({
-  expanded,
-  setExpanded,
-  theme,
-  children,
-}) {
-  const [userDetails, setUserDetails] = useState(null);
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      const docRef = doc(db, "Users", user.uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists) {
-        setUserDetails(docSnap.data());
-      } else {
-        toast.info("user not logged in", {
-          position: "top-center",
-        });
-      }
-    });
-  };
+export default function PatientSidebar({ expanded, setExpanded, children }) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
-    fetchUserData();
+    const checkDarkMode = () => {
+      const darkModeClassExists =
+        document.documentElement.classList.contains("dark");
+      setIsDarkMode(darkModeClassExists);
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
-  async function handleLogout() {
-    try {
-      await auth.signOut();
-      window.location.href = "/";
-    } catch (error) {
-      toast.error(error.message, {
-        position: "top-center",
-      });
-    }
-  }
+  const imageSrc = isDarkMode ? "/mode.png" : "/logo.png";
 
   function handleBackToMainDashboard() {
-    console.log("clicked");
     window.location.href = "/MainDashboard";
   }
 
   return (
     <div
-      className={`fixed left-0 top-0 z-10 h-screen border-r pt-4 px-4 transition-all duration-300 bg-white dark:bg-sky-900${
+      className={`fixed left-0 top-0 z-10 h-screen border-r pt-4 px-4 transition-all duration-300 bg-white dark:bg-sky-900 ${
         expanded ? "w-16 md:w-56" : "w-16"
       }  `}>
       {/* logo */}
@@ -62,26 +42,38 @@ export default function PatientSidebar({
         {expanded ? (
           <>
             <div className="md:flex justify-between">
-              <img src="/logo.png" alt="logo" className="w-32 hidden md:flex" />
+              <img src={imageSrc} alt="logo" className="w-32 hidden md:flex" />
               <img
                 src="/mini-logo.png"
                 alt="logo"
-                className="w-8 flex md:hidden"
+                className="w-8 flex md:hidden dark:bg-white"
               />{" "}
               <button
                 onClick={() => setExpanded((curr) => !curr)}
-                className="mt-3  p-2 rounded-lg bg-white  dark:bg-sky-900 hover:bg-gray-100 hover:dark:bg-white">
-                {expanded ? <LuChevronFirst /> : <LuChevronLast />}
+                className="mt-3  p-2 rounded-lg bg-white  dark:bg-sky-900 hover:bg-gray-100 hover:dark:bg-sky-800">
+                {expanded ? (
+                  <LuChevronFirst className="dark:text-white" />
+                ) : (
+                  <LuChevronLast className="dark:text-white" />
+                )}
               </button>
             </div>
           </>
         ) : (
           <div>
-            <img src="/mini-logo.png" alt="logo" className="w-8 flex" />
+            <img
+              src="/mini-logo.png"
+              alt="logo"
+              className="w-8 flex dark:bg-white"
+            />
             <button
               onClick={() => setExpanded((curr) => !curr)}
-              className="p-2 rounded-lg bg-blue-500 mt-2 hover:bg-gray-100">
-              {expanded ? <LuChevronFirst /> : <LuChevronLast />}
+              className="p-2 rounded-lg bg-blue-500 mt-2 hover:bg-gray-100 dark:bg-sky-800">
+              {expanded ? (
+                <LuChevronFirst className="dark:text-white" />
+              ) : (
+                <LuChevronLast className="dark:text-white" />
+              )}
             </button>
           </div>
         )}
@@ -92,7 +84,7 @@ export default function PatientSidebar({
       <div className="p-4 pb-2 flex justify-between items-center">
         <h1
           className={`overflow-hidden transition-all ${
-            expanded ? "w-32" : "w-0"
+            expanded ? "w-32 dark:text-white" : "w-0"
           }`}>
           Menu
         </h1>
@@ -133,20 +125,22 @@ export default function PatientSidebar({
   );
 }
 
-export function PatientSidebarItem({ icon, text, active, alert, onClick }) {
+export function PatientSidebarItem({ icon, text, active, onClick }) {
   const { expanded } = useContext(PatientSidebarContext);
   return (
     <li
-      className={`font-medium rounded-md py-2  hover:bg-gray-100 hover:text-indigo-500 cursor-pointer group${
-        active ? "bg-indigo-100 text-indigo-500 " : ""
+      className={`font-medium rounded-md py-2 cursor-pointer group bg-gray-100 dark:bg-[#24292F] hover:bg-gray-200 dark:hover:bg-gray-500 dark:text-gray-200 hover:text-indigo-500 dark:hover:text-indigo-500 transition-all duration-200${
+        active ? "bg-indigo-100 text-indigo-500 dark:text-indigo-500" : ""
       } ${expanded ? "px-2 md:px-5" : "ml-2"}`}
       onClick={onClick}>
       <div className="flex">
         <a className="flex justify-center md:justify-start items-center md:space-x-5">
           <span>{icon}</span>
           <span
-            className={`overflow-hidden transition-all text-sm text-gray-500 hidden md:flex ${
-              expanded ? "w-52 ml-3 text-left" : "w-0"
+            className={`overflow-hidden transition-all text-sm text-gray-500 dark:text-gray-300 hidden md:flex ${
+              expanded
+                ? "w-52 ml-3 text-left opacity-100 visible"
+                : "w-0 opacity-0 invisible"
             }`}>
             {text}
           </span>
