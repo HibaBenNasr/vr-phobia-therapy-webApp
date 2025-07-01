@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import LoginPage from "./Components/LoginRegister/LoginPage";
 import MainDashboard from "./Components/MainDashboard/MainDashboard";
 import PatientDashboard from "./Components/PatientDashboard/PatientDashboard";
+import Profile from "./Components/MainDashboard/Profile/Profile";
 
 function App() {
   const [user, setUser] = useState();
@@ -61,7 +62,7 @@ function App() {
 
   return (
     <Router>
-      <div className="App">
+      <div className="App bg-gray-100 dark:bg-gray-900">
         <div className="auth-wrapper">
           <div className="auth-inner">
             <Routes>
@@ -69,7 +70,6 @@ function App() {
                 path="/"
                 element={
                   loading ? (
-                    // <LoadingSpinner /> // or null if you don’t want to show anything
                     loadingDiv()
                   ) : user ? (
                     <Navigate to="/MainDashboard" />
@@ -78,16 +78,23 @@ function App() {
                   )
                 }
               />
-              {/* <Route
+              <Route
                 path="/Profile"
-                element={<Profile />}
-              /> */}
+                element={
+                  loading ? (
+                    loadingDiv()
+                  ) : user ? (
+                    <Profile />
+                  ) : (
+                    <Navigate to="/LoginPage" replace />
+                  )
+                }
+              />
 
               <Route
                 path="/MainDashboard"
                 element={
                   loading ? (
-                    // <LoadingSpinner /> // or null if you don’t want to show anything
                     loadingDiv()
                   ) : user ? (
                     <MainDashboard />
@@ -101,7 +108,6 @@ function App() {
                 path="/PatientDashboard"
                 element={
                   loading ? (
-                    // <LoadingSpinner /> // or null if you don’t want to show anything
                     loadingDiv()
                   ) : user ? (
                     <PatientDashboard />
@@ -115,7 +121,6 @@ function App() {
                 path="/LoginPage"
                 element={
                   loading ? (
-                    // <LoadingSpinner /> // or null if you don’t want to show anything
                     loadingDiv()
                   ) : user ? (
                     <Navigate to="/MainDashboard" replace />
@@ -124,8 +129,6 @@ function App() {
                   )
                 }
               />
-
-              {/* <Navigate to="/LoginPage" replace /> */}
             </Routes>
             <ToastContainer />
           </div>

@@ -125,7 +125,7 @@ const PatientInfo = () => {
 
   if (loading)
     return (
-      <div className="h-full w-full flex flex-col items-center justify-center">
+      <div className="h-full w-full flex flex-col items-center justify-center mt-20 h-screen">
         <svg
           className="animate-spin w-48 h-48 text-blue-500 "
           xmlns="http://www.w3.org/2000/svg"
@@ -325,7 +325,7 @@ const PatientInfo = () => {
           </div>
           {/* Allergy Section */}
           <div className="border rounded-xl p-4 mb-4 bg-gray-50 dark:bg-gray-500">
-            <label className="flex items-center mb-2 text-base font-semibold text-gray-800">
+            <label className="flex items-center mb-2 text-base font-semibold text-gray-800 ">
               <input
                 type="checkbox"
                 name="allergies"
@@ -338,7 +338,7 @@ const PatientInfo = () => {
                     AllergiesDetails: checked ? "" : "none",
                   }));
                 }}
-                className="mr-2 "
+                className="mr-2"
               />
               Has Allergies
             </label>
@@ -348,8 +348,10 @@ const PatientInfo = () => {
               disabled={!formData.allergies}
               value={formData.AllergiesDetails}
               onChange={handleChange}
-              className={`w-full border rounded-lg p-2 text-sm dark:bg-gray-700${
-                !formData.allergies ? "bg-gray-200 cursor-not-allowed" : ""
+              className={`w-full border rounded-lg p-2 text-sm dark:bg-gray-700 dark:text-white${
+                !formData.allergies
+                  ? "bg-gray-200 cursor-not-allowed dark:text-white "
+                  : ""
               }`}
               placeholder="Describe allergies..."
               rows={3}
@@ -384,9 +386,9 @@ const PatientInfo = () => {
               disabled={!formData.MedicalCondition}
               value={formData.MedicalConditionDetails}
               onChange={handleChange}
-              className={`w-full border rounded-lg p-2 text-sm dark:bg-gray-700${
+              className={`w-full border rounded-lg p-2 text-sm dark:bg-gray-700 dark:text-white${
                 !formData.MedicalCondition
-                  ? "bg-gray-200 cursor-not-allowed "
+                  ? "bg-gray-200 cursor-not-allowed dark:text-white "
                   : ""
               }`}
               placeholder="Describe medical condition..."

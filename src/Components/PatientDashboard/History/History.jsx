@@ -22,7 +22,7 @@ const History = () => {
       if (!user) return;
       fetchSessionSummaries(user, patientID).then(setSessions);
     });
-    return () => unsubscribe(); // clean up the listener
+    return () => unsubscribe();
   }, [patientID]);
 
   const fetchSessionSummaries = async (user, patientID) => {

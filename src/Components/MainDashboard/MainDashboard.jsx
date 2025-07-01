@@ -44,7 +44,7 @@ const MainDashboard = () => {
   //end theme
   return (
     <div className="bg-gray-100 dark:bg-gray-900 p-3">
-      <div className="flex">
+      <div className="flex bg-gray-100 dark:bg-gray-900 h-screen">
         <Sidebar expanded={sidebarExpanded} setExpanded={setSidebarExpanded}>
           <SidebarItem
             icon={<FaRegListAlt />}
