@@ -38,10 +38,6 @@ const LoginPage = () => {
           email: user.email,
           firstname: fname,
           lastname: lname,
-          EquipmentAvailability: {
-            Sensors: false,
-            VRHeadset: false,
-          },
         });
       }
       toast.success("User Registered Successfully!!", {

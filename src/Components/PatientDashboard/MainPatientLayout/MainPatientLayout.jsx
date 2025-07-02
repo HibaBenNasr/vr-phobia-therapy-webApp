@@ -209,10 +209,15 @@ const MainPatientLayout = () => {
       last_updated: timestamp,
     };
 
-    updateData[`level_transitions/${timestamp}`] = {
-      mode: currentMode,
-      level: newLevel,
-    };
+    console.log(
+      "mode " + currentMode + " sessionStat.Scene " + sessionStat.scene
+    );
+    if (currentMode == "manual" && sessionStat.scene == "Acrophobia") {
+      updateData[`level_transitions/${timestamp}`] = {
+        mode: currentMode,
+        level: newLevel,
+      };
+    }
 
     update(levelRef, updateData)
       .then(() => {
