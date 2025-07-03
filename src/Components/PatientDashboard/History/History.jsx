@@ -62,7 +62,7 @@ const History = () => {
           Session History
         </h2>
         <div className="overflow-x-auto  ">
-          <table className="w-full table-auto border-separate border-spacing-y-2">
+          <table className="w-full table-auto border-separate border-spacing-y-2 min-h-[255px]">
             <thead className="bg-indigo-600 text-white dark:bg-indigo-400">
               <tr>
                 <th className="px-4 py-3">Date</th>
@@ -120,8 +120,8 @@ const History = () => {
                     <tr className="bg-gray-50 dark:bg-gray-900 text-sm">
                       <td colSpan="6" className="px-4 py-5">
                         <div className="grid md:grid-cols-2 gap-4">
-                          <div className="max-h-64 overflow-y-auto p-2 bg-white dark:bg-gray-700 rounded-lg">
-                            <strong className=" block font-semibold mb-1">
+                          <div className="max-h-64 overflow-y-auto p-2 bg-white dark:bg-gray-500 rounded-lg">
+                            <strong className=" block font-semibold mb-1 text-center">
                               Level of exposure Transitions
                             </strong>
                             <ul className="list-disc ml-5 space-y-1">
@@ -148,8 +148,8 @@ const History = () => {
                               )}
                             </ul>
                           </div>
-                          <div className="max-h-64 overflow-y-auto p-2 bg-white dark:bg-gray-700 rounded-lg">
-                            <strong className="block mb-1">
+                          <div className="max-h-64 overflow-y-auto p-2 bg-white dark:bg-gray-500 rounded-lg">
+                            <strong className="block mb-1 text-center">
                               Stress Level Changes
                             </strong>
                             {sessionDetails[session.id]?.sensorData ? (

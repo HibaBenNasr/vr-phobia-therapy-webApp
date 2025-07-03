@@ -51,7 +51,7 @@ const PatientDashboard = () => {
 
   return (
     <div className=" mt-2 bg-gray-100 dark:bg-gray-900 p-3 ">
-      <div className="flex bg-gray-100 dark:bg-gray-900 ">
+      <div className="flex bg-gray-100 dark:bg-gray-900">
         <PatientSidebar
           expanded={sidebarExpanded}
           setExpanded={setSidebarExpanded}
