@@ -86,7 +86,9 @@ const PatientDashboard = () => {
           />
 
           {activeItemPatient == "MainPatientLayout" ? (
-            <MainPatientLayout theme={theme} />
+            <MainPatientLayout
+              goToHistory={() => handlePatientSidebarItemClick("History")}
+            />
           ) : activeItemPatient == "History" ? (
             <History />
           ) : activeItemPatient == "PatientInfo" ? (

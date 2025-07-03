@@ -16,7 +16,6 @@ const ToggleSwitch = ({
 
   useEffect(() => {
     setMode(currentMode);
-    console.log(currentMode);
   }, [currentMode]);
 
   return (

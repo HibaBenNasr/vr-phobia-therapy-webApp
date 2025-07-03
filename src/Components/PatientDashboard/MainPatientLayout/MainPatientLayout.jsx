@@ -1,7 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { auth, db, RTdatabase } from "../../../firebase/firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { onValue, ref, update } from "firebase/database";
+import {
+  doc,
+  getDoc,
+  orderBy,
+  query,
+  limit,
+  collection,
+} from "firebase/firestore";
+import { get, onValue, ref, update } from "firebase/database";
 import StartSessionModal from "./StartSessionModal";
 import SessionControls from "./SessionControls";
 import { startNewSession, endSessionData } from "./utils/sessionHelpers";
@@ -9,8 +16,10 @@ import Charts from "./Charts";
 import { useSearchParams } from "react-router-dom";
 import { FaCheckCircle } from "react-icons/fa";
 import { CgUnavailable } from "react-icons/cg";
+import { onAuthStateChanged } from "firebase/auth";
+import LastSessionSummary from "./LastSessionSummary";
 
-const MainPatientLayout = () => {
+const MainPatientLayout = ({ goToHistory }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   useEffect(() => {
     searchParams.set("interface", "MainPatientLayout");
@@ -458,6 +467,7 @@ const MainPatientLayout = () => {
         </div>
         {/* end stress state card  */}
       </div>
+      <LastSessionSummary patientID={patientID} goToHistory={goToHistory} />
     </div>
   );
 };
