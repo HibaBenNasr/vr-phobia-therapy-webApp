@@ -211,7 +211,7 @@ const MainPatientLayout = ({ goToHistory }) => {
     if (!sessionID) return;
 
     const levelRef = ref(RTdatabase, `sessions/${sessionID}`);
-    const timestamp = Math.floor(Date.now() / 1000);
+    const timestamp = Date.now();
 
     const updateData = {
       current_level: newLevel,
@@ -322,6 +322,8 @@ const MainPatientLayout = ({ goToHistory }) => {
         return "bg-orange-500 animate-pulse";
       case "neutral":
         return "bg-green-600 animate-pulse";
+      case "no_sensors":
+        return "bg-zinc-950 animate-pulse";
       default:
         return "bg-gray-400";
     }
@@ -452,13 +454,17 @@ const MainPatientLayout = ({ goToHistory }) => {
           <div
             className={` p-4 rounded-xl shadow-md  h-full text-white transition-all duration-300 ease-in-out ${
               sessionStat?.start_session
-                ? getColorClass(stressLevel)
+                ? !isRecentlyOnline(lastOnline)
+                  ? getColorClass("no_sensors")
+                  : getColorClass(stressLevel)
                 : "bg-gray-500"
             }`}>
             <div className="text-lg font-semibold mb-1">Stress Level</div>
             <div className="text-2xl tracking-wide">
               {sessionStat?.start_session
-                ? stressLevel
+                ? !isRecentlyOnline(lastOnline)
+                  ? "Sensor not connected"
+                  : stressLevel
                   ? stressLevel.replace("_", " ").toUpperCase()
                   : "Loading..."
                 : "Session not started"}
